@@ -25,5 +25,3 @@ Install and import the required packages - tibble, lsmeans, dplyr, relimp, rstud
 1. Download the Training files of Site 1 and Site 2 for both Neofax and Nutrition (These files are created from JAVA code - EsphaganErrors.java and NeofaxErrors.java)
 2. Define the path in Baseline Table 1.R, Final_table.R and in other R files.
 3. Run the script and respective Tables and Figures will be generated.
-# CHI-LOS
-# CHI-LOS
