@@ -168,7 +168,7 @@ for (i in 1:length(sheet_names)){
   gestation_cat4_1 = temp_data[which(temp_data$GESTATION > 37),]
   
   data_name_1 = c('gestation_cat1_1', 'gestation_cat2_1', 'gestation_cat3_1', 'gestation_cat4_1')
-
+  
   
   #run the below line only once
   this_file = temp_data
@@ -234,8 +234,8 @@ for (i in 1:length(sheet_names)){
 
 #### Starting medication files ####
 #med_data prep
-med = read_excel('Site1_Neofax_Training_withoutcaffeine.xlsx',sheet = 1)
-dose_raw = rbind(med, read_excel('Site2_Neofax_Training_withoutcaffeine.xlsx',sheet = 1))
+med = read_excel('Site1_Neofax_Training.xlsx',sheet = 1)
+dose_raw = rbind(med, read_excel('Site2_Neofax_Training.xlsx',sheet = 1))
 dose_raw = dose_raw[-1,] #row not needed
 dose_raw = dose_raw[-(nrow(med)),] #removed first blank column which was generated while appending second cehtre's med
 #GESTATION
@@ -322,7 +322,7 @@ for (ges_med in 1:length(med_name)){
     }
   }
   
- 
+  
   
   # positive #
   temp_med = dose[which(numerator > 0),]
@@ -387,6 +387,7 @@ gestation_cat4$GES_CATEGORYzzz[which(gestation_cat4$GESTATIONzzz > quantile(gest
 gestation_cat4$GES_CATEGORYzzz[which(gestation_cat4$GESTATIONzzz <= quantile(gestation_cat4$GESTATIONzzz)[2])] = 'Category2'
 
 data_name = c('gestation_cat1', 'gestation_cat2','gestation_cat3','gestation_cat4')
+
 
 final_result = cbind(NA,NA,NA,NA,NA,NA)
 for (i in 1:length(data_name)) {

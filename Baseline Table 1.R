@@ -28,7 +28,7 @@ baseline_data_all = baseline_data_all[-(outliers),]
 #Mode of delivery 
 for (i in 1:nrow(baseline_data_all)){
   if(baseline_data_all$Mode.of.delivery[i] == "Vaccum" | baseline_data_all$Mode.of.delivery[i] == "Forceps"){
-      baseline_data_all$Mode.of.delivery[i] = 'NVD'
+    baseline_data_all$Mode.of.delivery[i] = 'NVD'
   }
 }
 
@@ -147,7 +147,7 @@ ges_morethan_37 = na.omit(ges_morethan_37)
 
 see = cbind(ges_lessthan_32, ges_32_34[,3], ges_34_37[,3], ges_morethan_37[,3],stringsAsFactors = FALSE)
 for (m in 1:ncol(see)){
-    see[,m] <- as.character(unlist(see[,m]))
+  see[,m] <- as.character(unlist(see[,m]))
 }
 
 intro = c("", "Gestation categories", "Gest <32", "Gest 32-34", "Gest 34-37", "Gest >37")
@@ -255,7 +255,7 @@ for (i in 1:length(sheet_names)){
     #gestation_cat1$GES_CATEGORYzzz[which(gestation_cat1$GESTATIONzzz > quantile(gestation_cat1$GESTATIONzzz)[2])] = 'Category1'
     
     fourth_deviation = median(numerator[which(numerator >= quantile(numerator)[4])], digits =1 )
-    dum1 = capture.output(cat(fourth_deviation,"(", net_fourth,")"))
+    dum1 = capture.output(cat(fourth_deviation,"(", fourth,")"))
     
     # rest quartiles
     rest = round(IQR(numerator[which(numerator < quantile(numerator)[4])]), digits=1)
@@ -270,7 +270,7 @@ for (i in 1:length(sheet_names)){
     rest_deviation = median(numerator[which(numerator < quantile(numerator)[4])], digits = 1)
     #gestation_cat1$GES_CATEGORYzzz[which(gestation_cat1$GESTATIONzzz <= quantile(gestation_cat1$GESTATIONzzz)[2])] = 'Category2'
     
-    dum2 = capture.output(cat(rest_deviation,"(", net_rest,")"))
+    dum2 = capture.output(cat(rest_deviation,"(", rest,")"))
     
     # #first quartile
     # first = round(mean(category_file$LOS[which(numerator <= quantile(numerator)[2])]), digits=1)
@@ -330,10 +330,13 @@ gestation_med_cat2 = dose_raw[which(dose_raw$GESTATION >= 32 & dose_raw$GESTATIO
 gestation_med_cat3 = dose_raw[which(dose_raw$GESTATION > 34 & dose_raw$GESTATION <= 37),]
 gestation_med_cat4 = dose_raw[which(dose_raw$GESTATION > 37),]
 
+
+
 med_data_name = c('gestation_med_cat1', 'gestation_med_cat2', 'gestation_med_cat3', 'gestation_med_cat4')
 
-med_col1 = c("Dose","Dose","Dose")
-med_col2 = c('No deviation', 'Negative deviation', 'Positive deviation')
+
+med_col1 = c("Dose","Dose","Dose","Dose")
+med_col2 = c('Medication Received', 'No deviation', 'Deviation days','Medication Not Required')
 med_all_cols = cbind(med_col1, med_col2)
 
 for (ges_med in 1:length(med_data_name)){
@@ -343,47 +346,88 @@ for (ges_med in 1:length(med_data_name)){
   dum3=0
   dose = get(med_data_name[ges_med])
   diff_index = grep('Diff', colnames(dose))
+  error_index = grep('Error.Days', colnames(dose))
+  result_index = grep('Result', colnames(dose))
+  
+  
   #Changed class to numeric!
   dose[,diff_index] <- as.numeric(as.character(unlist(dose[,diff_index])))
+  dose[,error_index] <- as.numeric(as.character(unlist(dose[,error_index])))
   
   numerator = 0
   given_value = as.numeric(unlist(dose[,diff_index[1]]))
   dummy = given_value
   numerator = numerator + dummy
+  error_list = 0
+  error = 0
+  
+  
+  dummy = as.numeric(unlist(dose[which(dose[,result_index[1]] == 'Deviation'),error_index[1]]))
+  dummy[which(is.na(dummy))] = 0
+  error = error + dummy
+  
+  deviation_list = unlist(dose[,result_index[1]] == 'Deviation')
+  
+  deviation_list[which(is.na(deviation_list))] = FALSE
+  
+  for(k in 1:length(deviation_list)){
+    if(deviation_list[k]=="TRUE"){
+      error_list[k] = unlist(dose[,error_index[1]])[k]
+    }else{
+      error_list[k] = 0
+    }
+  }
+  total_babies = length(deviation_list)
+  
   for (i in 2:250) {
     #unlist so that "values" is generated and not "med_data file"
     given_value = as.numeric(unlist(dose[,diff_index[i]]))
+    error_value = as.numeric(unlist(dose[,error_index[i]]))
+
     dummy = given_value
     dummy[which(is.na(dummy))] = 0
     numerator = numerator + dummy
+    
+    dummy = as.numeric(unlist(dose[which(dose[,result_index[1]] == 'Deviation'),error_index[1]]))
+    dummy[which(is.na(dummy))] = 0
+    error = error + dummy
+    
+    deviation_list = unlist(dose[,result_index[i]] == 'Deviation')
+    
+    deviation_list[which(is.na(deviation_list))] = FALSE
+    
+    for(k in 1:length(deviation_list)){
+      if(deviation_list[k]=="TRUE"){
+        error_list[k] = error_list[k] + unlist(dose[,error_index[i]])[k]
+      }else{
+        error_list[k] = error_list[k] + 0
+      }
+    }
   }
+  
+  index_final = which(error_list == 0)
+  error_list_final = error_list[-(index_final)]
+  error_list_final_median = median(error_list_final)
+  error_list_final_IQR = IQR(error_list_final)
   
   # med not given #
   temp_med_data = dose[which(is.na(numerator)),]
   if (nrow(temp_med_data)>0){
-    dum0 = capture.output(cat(round(mean(temp_med_data$LOS), digits=1),"(", nrow(temp_med_data),")"))
+    dum0 = capture.output(cat(total_babies - nrow(temp_med_data),"(",  ((total_babies - nrow(temp_med_data) ) * 100) / total_babies,")"))
+    
+    dum3 = capture.output(cat(nrow(temp_med_data),"(",  ((nrow(temp_med_data) ) * 100) / total_babies,")"))
   }
-  
   # no deviation #
   temp_med_data = dose[which(numerator == 0),]
   if (nrow(temp_med_data)>0){
-    dum1 = capture.output(cat(round(mean(temp_med_data$LOS), digits=1),"(", nrow(temp_med_data),")"))
+    dum1 = capture.output(cat(nrow(temp_med_data),"(",  ((nrow(temp_med_data)) * 100) / total_babies,")"))
+    
   }
-  
-  # negative #
-  temp_med_data = dose[which(numerator < 0),]
-  if (nrow(temp_med_data)>0){
-    dum2 = capture.output(cat(round(mean(temp_med_data$LOS), digits=1),"(", nrow(temp_med_data),")"))
-  }
-  
-  # positive #
-  temp_med_data = dose[which(numerator > 0),]
-  if (nrow(temp_med_data)>0){
-    dum3 = capture.output(cat(round(mean(temp_med_data$LOS), digits=1),"(", nrow(temp_med_data),")"))
-  }
-    med_col3 = c(dum1,dum2,dum3)
-    med_all_cols = cbind(med_all_cols, med_col3)
-  }
+  dum2 =  capture.output(cat(error_list_final_median,"(",error_list_final_IQR,")"))
+
+  med_col3 = c(dum0,dum1,dum2,dum3)
+  med_all_cols = cbind(med_all_cols, med_col3)
+}
 med_all_cols = as.data.frame(med_all_cols)
 names(med_all_cols) <- names(see)
 see = rbind(see, med_all_cols)
