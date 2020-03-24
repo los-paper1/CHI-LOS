@@ -6,8 +6,6 @@ library(dplyr)
 library(relimp)
 library(rstudioapi)
 library(readxl)
-library(multcomp)
-library(emmeans)
 
 options(scipen=999) #switches off the scientific notations
 rm(list=ls())
@@ -88,7 +86,7 @@ for (i in 1:nrow(data_all)){
 #Maternal risk factors
 data_all = add_column(data_all, Maternal_risk_factors = "", .after = 36)
 for (i in 1:nrow(data_all)){
-  if (data_all$PROM[i] == 'TRUE' | data_all$PPROM[i] == 'TRUE' | 
+  if (data_all$PROM[i] == 'TRUE' | data_all$PPROM[i] == 'TRUE' | data_all$Prematurity[i] == 'TRUE' |
       data_all$Chorioamniotis[i] == 'TRUE' | data_all$Oligohydraminos[i] == 'TRUE' | data_all$Polyhydraminos[i] == 'TRUE'){
     data_all$Maternal_risk_factors[i] = 'TRUE'
   }
@@ -178,16 +176,7 @@ for (i in 1:length(sheet_names)){
     category_file = get(data_name_1[gest_cat])
     given_index = grep('Given', colnames(category_file))
     recommend_index = grep('Recommend', colnames(category_file))
-    los_index = grep('LOS', colnames(category_file))
-    los=0
-    los = as.numeric(unlist(category_file[,los_index[1]]))
-    recommended_final = 105
-    if(sheet_names[i] == "Energy"){
-      recommended_final = 105
-    }
-    if(sheet_names[i] == "Protein"){
-      recommended_final = 3
-    }
+   
     num = 0
     denominator = 0
     for (k in 1:199) {
@@ -388,7 +377,6 @@ gestation_cat4$GES_CATEGORYzzz[which(gestation_cat4$GESTATIONzzz <= quantile(ges
 
 data_name = c('gestation_cat1', 'gestation_cat2','gestation_cat3','gestation_cat4')
 
-
 final_result = cbind(NA,NA,NA,NA,NA,NA)
 for (i in 1:length(data_name)) {
   finalcolumn = c()
@@ -420,8 +408,6 @@ for (i in 1:length(data_name)) {
   
   model = lm(log(LOSzzz) ~ ., data = this_is_the_data)
   summary(model)
-  #ref_grid(model)
-  
   dummy = as.data.frame(which(round(summary(model)[["coefficients"]][,4],2) <= 0.050))
   column_lsmeans = c()
   for (j in 1:nrow(dummy)) {

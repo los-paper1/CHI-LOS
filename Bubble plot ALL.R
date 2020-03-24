@@ -15,13 +15,13 @@ library(viridis)
 library(readxl)
 library(tidyverse)
 
-data = read_excel('Site1_Nutrition_Validation.xlsx',sheet = 1)
+data = read_excel('Site1_Nutrition_Training.xlsx',sheet = 1)
 
 sheet_names = c('Energy', 'Protein', 'Vitamina', 'Vitamind','Calcium', 'Phosphorus', 'Iron')
 
 for (sheet in 1:length(sheet_names)){
-  assign(sheet_names[sheet], read_excel('Site1_Nutrition_Validation.xlsx',sheet = sheet_names[sheet]))
-  assign(sheet_names[sheet],rbind(get(sheet_names[sheet]), read_excel('Site2_Nutrition_Validation.xlsx',sheet = sheet_names[sheet])))
+  assign(sheet_names[sheet], read_excel('Site1_Nutrition_Training.xlsx',sheet = sheet_names[sheet]))
+  assign(sheet_names[sheet],rbind(get(sheet_names[sheet]), read_excel('Site2_Nutrition_Training.xlsx',sheet = sheet_names[sheet])))
   assign(sheet_names[sheet], get(sheet_names[sheet])[-1,])
   #removed first row of kalawati after rbind
   assign(sheet_names[sheet], get(sheet_names[sheet])[-(nrow(data)),])

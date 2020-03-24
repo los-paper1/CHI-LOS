@@ -153,7 +153,6 @@ data = as.data.frame(final_clubbed)
 data[,1:2] = as.character(unlist(data[,1:2]))
 data[,3:4] = as.numeric(as.character(unlist(data[,3:4])))
 
-tiff("Dosage_Medication.tiff", units="in", width=15, height=7, res=300)
 # insert ggplot code
 ggplot(data=data, aes(x=Gestation,y=LOS,fill=Label)) +
   geom_bar(position="dodge",stat="identity") +
@@ -174,7 +173,6 @@ ggplot(data=data, aes(x=Gestation,y=LOS,fill=Label)) +
     plot.title=element_text(face="bold",hjust=c(0,0))
   )
 
-dev.off()
 
 ### Frequency ####
 rm(list=ls())
@@ -328,7 +326,6 @@ data = as.data.frame(final_clubbed)
 data[,1:2] = as.character(unlist(data[,1:2]))
 data[,3:4] = as.numeric(as.character(unlist(data[,3:4])))
 
-tiff("Frequency_Medication.tiff", units="in", width=15, height=7, res=300)
 # insert ggplot code
 ggplot(data=data, aes(x=Gestation,y=LOS,fill=Label)) +
   geom_bar(position="dodge",stat="identity") +
@@ -348,5 +345,4 @@ ggplot(data=data, aes(x=Gestation,y=LOS,fill=Label)) +
     text=element_text(family="serif",size=20,face = 'bold'),
     plot.title=element_text(face="bold",hjust=c(0,0))
   )
-dev.off()
 
