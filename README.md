@@ -16,7 +16,7 @@ Install R Studio. R Studio version >= 1.1.463 is needed. R version 3.6.2
 
 -- Supplementary Figure S4(a,b,c,d): "Patient frequency vs LOS for various gestation categories" is generated from Supplementary 4.R
 
--- Supplementary Table S2(a,b,c): "Medicines deviation statistics" is generated from Medication tables 2a,b supp 3a,b.R
+-- Supplementary Table S2(a,b,c): "Medicines deviation statistics" is generated from  Medication tables.R
 
 Steps to successfully run individual scripts:
 Install and import the required packages - tibble, lsmeans, dplyr, relimp, rstudioapi, readxl, multcomp, qpcR, xquartz, ggplot2, hrbrthemes, viridis, tidyverse
